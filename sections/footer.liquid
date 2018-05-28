@@ -1,0 +1,189 @@
+{%- assign hasNewsletter = false -%}
+{%- assign blockCount = 0 -%}
+
+{%- for block in section.blocks -%}
+  {%- assign blockCount = blockCount | plus: 1 -%}
+  {%- case block.type -%}
+  {%- when 'newsletter' -%}
+    {%- assign hasNewsletter = true -%}
+  {%- endcase -%}
+{%- endfor -%}
+<script type="text/javascript">
+  window.addEventListener('DOMContentLoaded', function() {
+    var currentLocation = window.location;
+    console.log(currentLocation.href);
+    function getQueryStringValue (key) {  
+      return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+    }  
+
+    // Would write the value of the QueryString-variable called name to the console  
+    var res = getQueryStringValue("customer_posted");
+    console.log(res);
+    if(res == 'true'){
+      console.log("getting there ");
+      document.getElementById("demo").innerHTML = "Thank you for subscribing!"
+      $('html, body').animate({ scrollTop: $('#demo').offset().top }, '');
+      return false;
+    }
+
+
+  });
+</script>
+<footer
+  class="
+    main-footer
+    {% if hasNewsletter %}upper-footer-has-newsletter{% endif %}"
+  data-section-id="{{ section.id }}"
+  data-section-type="footer">
+  
+    <div style="margin:0px auto; text-align:center; padding-top:23px;"> <img src="https://cdn.shopify.com/s/files/1/2135/4653/files/wodup-logo-_1.png?8002515886146362311" style="width:133px;"/> </div>
+
+  
+  {% if section.blocks.size > 0 %}
+    <div class="upper-footer upper-footer-item-count-{{ blockCount }}">
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+        {%- when 'rich-text' -%}
+          <div class="upper-footer-item footer-blurb">
+            {% if section.settings.headings %}
+              <h4 class="section-title">{{ block.settings.heading | escape }}</h4>
+            {% endif %}
+
+            <div class="rte">{{ block.settings.rich_text }}</div>
+          </div>
+       
+        {%- when 'menu' -%}
+          {% assign linklist = linklists[block.settings.menu] %}
+
+          {% if linklist.links.size > 0 %}
+            <div class="upper-footer-item footer-linklist">
+              {% if section.settings.headings %}
+                <h4 class="section-title">{{ linklist.title }}</h4>
+              {% endif %}
+
+              <ul>
+                {% for link in linklist.links %}
+                  <li><a href="{{ link.url }}" {% if link.url contains 'http://' or link.url contains 'https://' %}target="_blank"{% endif %}>{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {%- when 'newsletter' -%}
+          <div class="mailing-list">
+            {% if section.settings.headings %}
+              <h4 class="section-title newsletter_title-footer">{{ 'general.newsletter.title' | t }}</h4>
+            {% endif %}
+<div class="footer-newsletterform">
+            {% form 'customer' %}
+              <input class="mailing-list-email" name="contact[email]" type="email" placeholder="your@email.com" value="">
+              <input type="hidden" id="contact_tags" name="contact[tags]" value="prospect,newsletter"/>
+              <div class="mailing-list-submit">
+                <input class="submit" name="subscribe" type="submit" value="{{ 'general.newsletter.subscribe' | t }}">
+              </div>
+            {% endform %}
+            </div>
+            
+            {%- when 'social-links' -%}
+            <div class="upper-footer-item footer-linklist socials">
+              {% if section.settings.headings %}
+              <h4 class="section-title">{{ 'layout.footer.social_heading'| t }}</h4>
+              {% endif %}
+
+              {% include 'social' %}
+            </div>		
+      
+          </div>
+     
+      
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  {% endif %}
+
+  <div class="sub-footer">
+    {% if shop.enabled_payment_types.size > 0 and section.settings.footer-payment-options %}
+      <div class="site-footer-item">
+        {% include 'payment' %}
+      </div>
+    {% endif %}
+
+    {% capture year %}
+      {{ "now" | date: "%Y" }}
+    {% endcapture %}
+    <div class="copyright-wrapper" style="text-align:center;">
+      {% capture shopName %}
+        {{ shop.name | link_to: '/' }}
+      {% endcapture %}
+      <p class="copyright" role="contentinfo">{{ 'layout.footer.copyright_html' | t: year: year, shop_name: shopName }}</p>
+      <p style="display:none;" class="attribution">Grid theme by <a href="http://pixelunion.net">Pixel Union</a>. {{ powered_by_link }}.</p>
+    </div>
+  </div>
+
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "headings",
+      "label": "Show footer headings"
+    },
+    {
+      "type": "checkbox",
+      "id": "footer-payment-options",
+      "label": "Show payment icons"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "rich_text",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "social-links",
+      "name": "Social links",
+      "settings": [
+        {
+           "type": "paragraph",
+           "content": "Social media account settings can be found in the \"social media\" section of \"general settings\"."
+        }
+      ],
+      "limit": 1
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "settings": [
+      ],
+      "limit": 1
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,42 @@
+{% comment %}
+  See: https://help.shopify.com/themes/customization/store/add-credit-card-icons
+{% endcomment %}
+
+{%- capture payment_types -%}
+amazon_payments,
+american_express,
+apple_pay,
+bitcoin,
+cirrus,
+dankort,
+diners_club,
+discover,
+dogecoin,
+dwolla,
+forbrugsforeningen,
+interac,
+jcb,
+litecoin,
+maestro,
+master,
+paypal,
+shopify_pay,
+stripe,
+visa
+{%- endcapture -%}
+
+{% assign payment_types = payment_types | strip_newlines | split: ',' %}
+
+<ul class="payment-options">
+  {%- for type in shop.enabled_payment_types -%}
+    {%- if payment_types contains type -%}
+      <li class="payment-type">
+        {%- include 'payment-icon', id: type -%}
+      </li>
+      
+    {%- endif -%}
+  {%- endfor -%}
+  <li>
+    <img style="max-width: 100%; width: 90%; margin-left: -15px;" src="https://cdn.shopify.com/s/files/1/2135/4653/files/afterpay-logo.png?7967466530477885964" />
+  </li>
+</ul>

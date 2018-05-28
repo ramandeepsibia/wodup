@@ -1,0 +1,152 @@
+<h1 class="page-title">{{ page.title }}</h1>
+
+{% include 'breadcrumbs' %}
+
+<div class="page-content rte">
+  {{ page.content }}
+  
+  <div class="size-guide-content">
+    
+    <div class="purpose">
+      <select id='purpose'>
+        <option value="0">Find size charts for:</option>
+        <option value="1">WOMEN</option>
+        <option value="2">MEN</option>
+        <option value="3">UNISEX</option>
+        <option value="4">JAW GRIPS & GLOVES</option>
+        <option value="5">KNEE SLEVES</option>
+        <option value="6">FORTIFY GEAR</option>
+      </select>
+    </div>
+    <ul class="size-guide-wrapper">
+     <li>
+       <a class="btn btn-secondary" href="#" id="women">WOMEN</a> 
+     </li>
+     <li>
+       <a class="btn btn-secondary" href="#" id="men">MEN</a>
+     </li>
+       <li>
+       <a class="btn btn-secondary" href="#" id="unisex">UNISEX</a>
+     </li>
+     <li>
+       <a class="btn btn-secondary" href="#" id="grip-gloves">JAW GRIPS & GLOVES</a>
+     </li>
+     <li>
+       <a class="btn btn-secondary" href="#" id="gear">KNEE SLEVES</a>
+     </li>
+      <li>
+        <a class="btn btn-secondary" href="#" id="fortify"> FORTIFY GEAR </a>
+      </li>
+     
+    </ul>
+    
+    <ul id="size-guide-wrapper-women" class="desc">
+      
+      <p>Find size charts for:</p>
+     <li>
+       <a class="btn btn-secondary" href="#" id="general" >General</a> 
+     </li>
+     <li>
+       <a class="btn btn-secondary" href="#" id="top">top</a>
+     </li>
+     <li>
+       <a class="btn btn-secondary" href="#" id="bottom">Bottom</a>
+     </li>
+    </ul>
+    
+    <ul id="size-guide-wrapper-men" class="desc">
+       <p>Find size charts for:</p>
+     <li>
+       <a class="btn btn-secondary" href="#" id="general-men">TOP</a> 
+     </li>
+     <li>
+       <a class="btn btn-secondary" href="#" id="top-men">BOTTOM</a>
+     </li>
+
+    </ul>
+    
+    <ul id="size-guide-wrapper-gear" class="desc">
+      
+     <li>
+       
+         
+       <h3>WORKT size guide.  </h3>
+
+	   <p>With your leg straight measure 2cm (3/4) inch below your kneecap around the circumference of your leg. </p>
+
+        <ul class="knee-sleves"> 
+          <li>•	X-Small: 31-33cm (12-13 inches) </li>
+          <li>•	Small: 33-35cm (13-14 inches) </li>
+          <li>•	Medium: 35-37cm (14-15 inches) </li>
+          <li>•	Large: 37-40cm (15-16 inches)</li>
+          <li>•	X-Large: 40-43cm (16-17 inches)</li>
+        </ul> 
+       
+     </li>
+     
+    </ul>
+    
+    <ul id="size-guide-wrapper-fortify" class="desc">
+      
+      <li>
+        <h3>FORTIFY GEAR </h3>
+			<ul class="knee-sleves"> 
+              <li>  HOW TO MEASURE AND CARE FOR MY VELCRO BELT</li>
+              <li>•	Keep belt stored with velcro joined</li>
+              <li>•	Keep away from other velcro - this could cause fraying</li>
+
+              <li style="text-transform:uppercase;">To obtain a size for a waist belt, please ensure to measure the circumference of your waist firmly –</li>
+              <li>XS – 65 - 78cms</li>
+              <li>S – 75 - 88cms</li>
+              <li>M – 85 - 98cms</li>
+              <li>L – 95 - 108cms</li>
+        	</ul>
+      
+      </li>
+      
+    </ul>
+    
+    <ul id="size-guide-wrapper-grip" class="desc">
+       
+     <li>
+       <img src="https://cdn.shopify.com/s/files/1/2135/4653/files/Jaw_pullup_grips_Royal_blue_size_guide.png?16692068718882125492" />
+     </li>
+    </ul>
+    
+    <p id="demo"></p>
+    
+    
+    
+    <div>
+      
+    </div>
+  </div>
+  
+  <style>
+    /*** page only css **/
+    .template-page .page-content {
+      max-width:100%;
+    }
+    /** page only css ends here **/
+  	#size-guide-wrapper-fortify li, #size-guide-wrapper-women li, #size-guide-wrapper-men li, .size-guide-wrapper li, #size-guide-wrapper-grip li, #size-guide-wrapper-gear li{
+     	display: inline-block!important; list-style-type:none;
+    }
+    .size-guide-wrapper li a, .desc li a{
+     	text-transform: uppercase; 
+    }
+    .size-guide-content{
+     	text-align: center; 
+    }
+    .desc, #size-guide-wrapper-women,#size-guide-wrapper-men, #size-guide-wrapper-grip, #size-guide-wrapper-gear{
+      	display:none; margin-top:6em;
+    }
+    #demo{margin-top:6em;}
+    .knee-sleves li{ width:100%; display:block;}
+  </style>
+  
+  <script>
+    //get href and load relavive options in the div underneath
+  </script>
+  
+  
+</div>

@@ -1,0 +1,179 @@
+{%- assign onboard = false -%}
+{%- assign featureCount = section.blocks.size -%}
+{%- assign featureIndex = 0 -%}
+
+{%- if featureCount == 0 -%}
+  {%- assign featureCount = 6 -%}
+  {%- assign onboard = true -%}
+{%- endif -%}
+
+<section
+  class="home-masonry home-masonry-alternative
+    home-masonry-feature-count-{{ featureCount }}
+    {% if onboard %}home-masonry-onboard{% endif %}
+    {% if section.settings.gutters %} home-masonry-gutters{% endif %}
+    {% if section.settings.hover %} home-masonry-hover{% endif %}"
+  data-masonry-layout="{{ section.settings.layout }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="home-masonry-alternative">
+  <div class="alterative-index-layout-logo">
+    {% if section.settings.logo %}
+      <img
+        class="logo-regular"
+        alt="{{ section.settings.logo.alt }}"
+        src="{{ section.settings.logo | img_url: '200x100' }}"
+        srcset="{{ section.settings.logo | img_url: '200x100', scale: 2 }} 2x">
+    {% else %}
+      <h1{% if section.settings.color != blank %} style="color: {{ section.settings.color }}"{% endif %}>{{ shop.name }}</h1>
+    {% endif %}
+  </div>
+
+  {%- unless onboard -%}
+    {%- for block in section.blocks -%}
+      {%- include 'home-masonry-feature' -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for i in (1..featureCount) -%}
+      {%-
+        include 'home-masonry-feature',
+        onboarding: true
+      -%}
+    {%- endfor -%}
+  {%- endunless -%}
+</section>
+
+{% schema %}
+{
+  "name": "Masonry alternative",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "info": "120px high recommended",
+      "label": "Alternate index layout logo"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text logo color",
+      "info": "If you're not using a custom logo, this option will set the color of your shop title."
+    },
+    {
+      "type": "checkbox",
+      "id": "gutters",
+      "label": "Enable gutters",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hover",
+      "label": "Enable hover text",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image_feature",
+      "name": "Image feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Masonry feature"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Showcase up to six features with overlaying text"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Text color",
+          "options": [
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            }
+          ],
+          "default": "black"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1400 x 700px recommended"
+        }
+      ]
+    },
+    {
+      "type": "video_feature",
+      "name": "Video feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Video feature"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Showcase up to six features with overlaying text"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Text color",
+          "options": [
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            }
+          ],
+          "default": "black"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "YouTube or Vimeo link",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1400 x 640px recommended"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

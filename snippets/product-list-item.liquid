@@ -1,0 +1,159 @@
+{% comment %}
+  @param product_hover
+         Uses a string to determine the product hover functionality
+         Defaults to: 'image-flip'
+
+  @param product_stock_level_threshold
+         An integer representing the stock level in which the stock
+         level overlay appears (when product_hover is 'stock-level')
+         Defaults to: 1
+
+  @param product_badges
+         If true, the product will use stock level badges
+         Defaults to: false
+
+  @param product_icons
+         If true, the product will use icons instead of text
+         Defaults to: false
+
+  @param product_vendor
+         If true, shows the product vendor
+         Defaults to: true
+{% endcomment %}
+
+{%- if product_hover == blank -%}
+  {%- assign product_hover = 'image-flip' -%}
+{%- endif -%}
+
+{%- if product_stock_level_threshold == blank -%}
+  {%- assign product_stock_level_threshold = 1 -%}
+{%- endif -%}
+
+{%- if product_badges == blank -%}
+  {%- assign product_badges = false -%}
+{%- endif -%}
+
+{%- if product_icons == blank -%}
+  {%- assign product_icons = false -%}
+{%- endif -%}
+
+{%- if product_vendor == blank -%}
+  {%- assign product_vendor = true -%}
+{%- endif -%}
+
+{% assign item = product %}
+{% if template contains 'search' %}
+  {% assign item = item %}
+{% elsif template contains 'product' %}
+  {% assign item = prod %}
+{% endif %}
+
+{% if product_hover == 'stock-level' and item.available %}
+  {% assign total = 0 %}
+  {% assign threshold = product_stock_level_threshold | times: 1 %}
+  {% assign infinity = false %}
+  {% for variant in item.variants %}
+    {% if variant.inventory_management == null %}
+      {% assign infinity = true %}
+    {% elsif variant.inventory_management == '' %}
+      {% assign infinity = true %}
+    {% elsif variant.inventory_management == 'shopify' and variant.inventory_policy == 'continue' %}
+      {% assign infinity = true %}
+    {% elsif infinity == false %}
+      {% capture temp %}{{ total | plus: variant.inventory_quantity }}{% endcapture %}
+      {% assign total = temp | times: 1 %}
+    {% endif %}
+  {% endfor %}
+  {% assign stockText = 'products.product.stock_indicator_message' | t: num: total %}
+{% endif %}
+
+<article class="product-list-item{% if product_hover == 'quick-shop' %} has-quick-shop{% endif %}" id="product-list-item-{{ item.id }}" data-product-id="{{ item.id }}">
+
+  {% assign secondaryImage = false %}
+  {% if item.images.size > 1 and product_hover == 'image-flip' %}
+    {% assign secondaryImage = true %}
+  {% endif %}
+
+  <figure class="product-list-item-thumbnail {% if secondaryImage %}has-secondary-image{% endif %}" data-url="{{ item.url | within: collection }}" style="{% if secondaryImage %}background-image:url({{ item.images[1] | img_url: 'grande' }}){% endif %}">
+    <a href="{{ item.url | within: collection }}">
+      {% if item.featured_image %}
+        <img src="{{ item | img_url: 'grande' }}" alt="{{ item.featured_image.alt | escape }}" />
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    </a>
+
+    {% if product_hover == 'quick-shop' %}
+
+      <script type="application/json" data-product-json>
+        {{ item | json }}
+      </script>
+
+      <script type="application/json" data-product-settings-json>
+        {
+          "addToCartText": {{ 'products.product.add_to_cart' | t | json }},
+          "enableHistory": {{ enable_history | json }},
+          "imageZoom": false,
+          "linkedOptions": false,
+          "processingText": {{ 'products.product.processing' | t | json }},
+          "ajaxAddProduct": true,
+          "setQuantityText": {{ 'products.product.set_quantity' | t | json }},
+          "soldOutText": {{ 'products.product.sold_out' | t | json }},
+          "unavailableText": {{ 'products.product.unavailable' | t | json }}
+        }
+      </script>
+
+      <span class="quick-shop-modal-trigger" data-product-handle="{{ item.handle }}" data-product-id="{{ item.id }}" data-variant-id="{{ item.selected_or_first_available_variant.id }}" data-vendor-url="{{ item.vendor | url_for_vendor }}">{{ 'products.product.quick_shop_trigger_text' | t }}</span>
+    {% elsif product_hover == 'stock-level' %}
+
+      {% if item.available and infinity == false and total <= threshold %}
+        <a class="product-list-item-inventory" href="{{ item.url }}">{{ stockText }}</a>
+      {% endif %}
+
+    {% endif %}
+    
+    {% for tag in item.tags %}
+      {% if tag  == 'pre-order' %}
+   		
+    	<span class="pre-order product-list-item-unavailable{% if product_icons %} product-icons{% endif %}" data-title="Pre-Order"></span>
+
+      {% endif %}
+    {% endfor %}
+    
+    
+
+    {% if product_badges %}
+      {% if item.available != true %}
+        <span class="product-list-item-unavailable{% if product_icons %} product-icons{% endif %}" data-title="{{ 'products.product.sold_out' | t }}"></span>
+      {% elsif item.compare_at_price_min > item.price_min %}
+        <span class="product-list-item-on-sale{% if product_icons %} product-icons{% endif %}" data-title="{{ 'products.product.on_sale' | t }}"></span>
+      {% endif %}
+    {% endif %}
+  </figure>
+
+  <div class="product-list-item-details">
+    {% if product_vendor %}
+      <p class="product-list-item-vendor">{{ item.vendor | link_to_vendor }}</p>
+    {% endif %}
+    <h2 class="product-list-item-title"><a href="{{ item.url | within: collection }}">{{ item.title }}</a></h2>
+    <p class="product-list-item-price">
+      {% if item.price_varies %}
+        {% if item.price_varies %}{{ 'products.product.from' | t }}{% endif %}
+        {% if item.compare_at_price_min > item.price_min %}
+          <span class="money">{{ item.price_min | money }}</span>
+          <span class="original money">{{ item.compare_at_price_min | money }}</span>
+        {% else %}
+          <span class="money">{{ item.price_min | money }}</span>
+        {% endif %}
+      {% else %}
+        {% if item.compare_at_price_min > item.price_min %}
+          <span class="money">{{ item.price_min | money }}</span>
+          <span class="original money">{{ item.compare_at_price_min | money }}</span>
+        {% else %}
+          <span class="money">{{ item.price_min | money }}</span>
+        {% endif %}
+      {% endif %}
+    </p>
+  </div>
+
+</article>

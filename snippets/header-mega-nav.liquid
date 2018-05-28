@@ -1,0 +1,128 @@
+<ul class="mobile-mega-nav navigation-submenu" data-linklist="{{ linkHandle }}">
+  {% assign items = 'mega-nav-1|mega-nav-2|mega-nav-3' | split: '|' %}
+  {% assign itemCount = 0 %}
+  {% for item in items %}
+    {% assign linklist = section.settings[item] %}
+
+    {% if linklists[linklist].links.size > 0 %}
+      <li class="has-dropdown">
+        <a
+          class="navigation-menu-link {% if hasMegaNav %}mega-nav-list-title{% endif %}"
+          href="#"
+          data-linklist-trigger="{{ linklists[linklist].title | downcase | handle }}-{{ forloop.index0 }}"
+          data-subnav-toggle
+        >
+          {% if hasMegaNav %}
+            {{ linklists[linklist].title }}
+            <span class="navigation-submenu-toggle">
+              {{- arrow_right -}}
+            </span>
+          {% else %}
+            {{ linklists[linklist].title }}
+          {% endif %}
+        </a>
+        <ul
+          class="navigation-submenu"
+          data-linklist="{{ linklists[linklist].title | downcase | handle }}-{{ forloop.index0 }}"
+        >
+          {% for link in linklists[linklist].links %}
+            <li>
+              <a
+                class="navigation-menu-link"
+                href="{{ link.url }}"
+              >
+                {{ link.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+{% assign items = 'mega-nav-1|mega-nav-2|mega-nav-3' | split: '|' %}
+{% assign itemCount = 0 %}
+{% for item in items %}
+  {% capture enabled %}{{ item }}{% endcapture %}
+  {% if section.settings[enabled] %}
+    {% assign itemCount = itemCount | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+{% if itemCount > 0 %}
+  <div class="mega-nav">
+
+    {% if section.settings.mega-nav-image-default %}
+      <figure class="mega-nav-image">
+        {%- if section.settings.mega-nav-image-default -%}
+          <img
+            alt="{{ section.settings.mega-nav-image-default.alt }}"
+            src="{{ section.settings.mega-nav-image-default | img_url: '300x300' }}"
+            data-image="{{ section.settings.mega-nav-image-default | img_url: '300x300' }}"
+            data-image-alt="{{ shop.name | escape }}"
+          >
+        {%- else -%}
+          <img
+            src="{%- include 'svg-placeholder-uri' placeholder: 'image' -%}"
+            data-image="{%- include 'svg-placeholder-uri' placeholder: 'image' -%}"
+            data-image-alt=""
+          >
+        {%- endif -%}
+      </figure>
+    {% endif %}
+
+    <div class="mega-nav-list-wrapper">
+      {% for item in items %}
+
+        {% capture enabled %}{{ item }}{% endcapture %}
+        {% assign linklist = section.settings[enabled] %}
+
+        {% if linklists[linklist].links.size > 0 %}
+
+          <ul class="mega-nav-list">
+            <li class="mega-nav-list-title">
+              {{ linklists[linklist].title }}
+            </li>
+
+            {% for link in linklists[linklist].links %}
+
+              {%- capture image -%}
+                {%- if section.settings.mega-nav-image-default != blank -%}
+                  {{ section.settings.mega-nav-image-default | img_url: '300x300' }}
+                {%- else -%}
+                  {%- include 'svg-placeholder-uri' placeholder: 'image' -%}
+                {%- endif -%}
+              {%- endcapture -%}
+
+              {%- if link.type == 'collection_link' -%}
+                {%- assign collection = link.object -%}
+
+                {%- if collection.image -%}
+                  {%- assign image = collection.image | img_url: '300x300' -%}
+                {%- elsif collection.products.first.featured_image -%}
+                  {%- assign image = collection.products.first.featured_image | img_url: '300x300' -%}
+                {%- endif -%}
+              {%- elsif link.type == 'product_link' -%}
+                {%- assign product = link.object -%}
+
+                {%- if product.featured_image -%}
+                  {%- assign image = product.featured_image | img_url: '300x300' -%}
+                {%- endif -%}
+              {%- endif -%}
+
+              <li
+                data-image="{{ image }}"
+                data-image-alt="{{ image.alt }}"
+              >
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+
+        {% endif %}
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}

@@ -1,0 +1,327 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]><html class="no-js ie8 lt-ie10 lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="no-js ie9 lt-ie10" lang="en"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W4BXMDH');</script>
+<!-- End Google Tag Manager -->
+  
+  <meta name="google-site-verification" content="CP0tAP6trmjxvIlAwIfMy_qEIFjQQqBlTkRdQYZmjVM" />
+
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>
+    {{ page_title }}
+
+    {% if current_tags %}
+      &#8211; {{ current_tags | join: ', ' }}
+    {% endif %}
+
+    {% if current_page != 1 %}
+      &#8211; {{ 'general.pagination.page' | t: page_number: current_page }}
+    {% endif %}
+
+    {% unless page_title contains shop.name %}
+      &#8211; {{ shop.name }}
+    {% endunless %}
+  </title>
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}" />
+  {% endif %}
+
+  {% if settings.favicon %}
+    <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" type="image/png" />
+  {% endif %}
+
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  {{ content_for_header }}
+
+  {% include 'social-meta' %}
+
+  <!-- Theme CSS -->
+  {{ 'theme.scss.css' | asset_url | stylesheet_tag }}
+{{ 'custom.css' | asset_url | stylesheet_tag }}
+  {% if settings.custom-css != blank %}
+    <style>
+      {{ settings.custom-css }}
+    </style>
+  {% endif %}
+
+  <!-- Third Party JS Libraries -->
+  {{ 'modernizr-2.8.2.min.js' | asset_url | script_tag }}
+   
+
+  <!-- Theme object -->
+  {% include 'theme-options' %}
+
+  <script>
+    window.products = {};
+  </script>
+  <meta name="google-site-verification" content="CpP-mZzck1dnMJOm1o7Rx1a8MGwWq7qo0bQrq0zm4E4" />
+
+</head>
+
+<body class="{% if customer %}customer-logged-in{% endif %} template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}  {% if settings.blog-promo %}has-promo{% endif %} {% if settings.related-products and collection.products.size > 1 and template contains 'product' %}has-related-products-{{ settings.related-products-position }}{% endif %} {% if settings.product-hover == 'quick-shop' %}has-quick-shop{% endif %} loading" >
+
+  {% include 'quick-shop' %}
+
+  {% section 'header' %}
+
+  {% if template == 'index' %}
+
+  <!-- alternative homepage -->
+  
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W4BXMDH"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  
+<div class="page-width">
+  <div class="grid">
+    <div class="grid__item medium-up--five-sixths medium-up--push-one-twelfth">
+      <div class="section-header text-center">
+       
+
+      </div>
+
+      <div class="rte">
+      
+        <div class="product_layout">
+          <div class="banner_left">
+            {{ pages.collections.content }}
+          </div>  
+          <div class="product_layout_rightt" id="collections-listing">{% if linklists.featured-collections.links.size > 0 %}
+              <ul class="product_layout_right">
+              {% for link in linklists.featured-collections.links limit:4%}
+              {% assign collection = link.object %}
+              {% unless collection.handle == 'collections' %}
+                <li class="{{ collection.handle }}-collection product_first_right">      
+                {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+                  <div class="collection">
+                    <div class="collection-image">
+                      <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                        {% if collection.image %}
+                          {{ collection.image.src | collection_img_url: 'large' | img_tag: collection_title }}{% else %}
+                          {{ collection.products.first.featured_image | product_img_url: 'large' | img_tag: collection_title }}
+                        {% endif %}
+
+                      </a>
+                    </div><!-- end of .collection-image -->
+                    <div class="collection-description">
+                      <h6>
+                        <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                          {{ collection.title }}
+                        </a>
+                        
+                      </h6>
+                    </div><!-- end of .collection-description -->
+                  </div><!-- end of .collection -->
+                </li>
+              {% endunless %}
+              {% endfor %}
+              </ul> {% else %}
+            <p>Please {{ 'create a link list' | link_to: '/admin/links' }} that contains links to all the collections you wish to feature on this page. The title of that link list must be <strong>Featured Collections</strong>. If you want your collections to be listed alphabetically, reorder them alphabetically on your {{ 'Navigation page' | link_to: '/admin/links' }}.</p>{% endif %}
+          </div><!-- end of #collection-listing -->
+          </div>
+          <div class="bottom_products">
+              <ul class="product_layout_bottom">
+              {% for link in linklists.featured-collections.links offset:4%}
+              {% assign collection = link.object %}
+              {% unless collection.handle == 'collections' %}
+                <li class="{{ collection.handle }}-collection product_first_bottom">      
+                {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+                  <div class="collection">
+                    <div class="collection-image">
+                      <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                       {% if collection.image %}
+                          {{ collection.image.src | collection_img_url: 'large' | img_tag: collection_title }}{% else %}
+                          {{ collection.products.first.featured_image | product_img_url: 'large' | img_tag: collection_title }}
+                       {% endif %}
+                      </a>
+                    </div><!-- end of .collection-image -->
+                    <div class="collection-description">
+                      <h6>
+                        <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                          {{ collection.title }}
+                        </a>
+                        
+                      </h6>
+                    </div><!-- end of .collection-description -->
+                  </div><!-- end of .collection -->
+                </li>
+              {% endunless %}
+              {% endfor %}
+                
+                
+                <li>      
+               
+                  <div class="collection">
+                    <div class="collection-image">
+                      <a href="/">
+                       <img  alt="Wodup after pay" src="https://cdn.shopify.com/s/files/1/2135/4653/files/Afterpay-wodup.jpg?6226509095363848028">
+                      </a>
+                    </div><!-- end of .collection-image -->
+                    <div class="collection-description" style="display:none;">
+                      <h6>
+                        <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                          {{ collection.title }}
+                        </a>
+                        
+                      </h6>
+                    </div><!-- end of .collection-description -->
+                  </div><!-- end of .collection -->
+                </li>
+                
+              </ul>
+  
+          </div>
+        </div>  
+      </div>
+       
+
+    </div>
+
+ </div>
+
+{% endif %}
+
+  
+  <!-- alternative homepage ends here -->
+  {% if page.handle == "size-guide" %}
+  <div class="main-content" style="background:url('https://cdn.shopify.com/s/files/1/2135/4653/files/scrolling_pic__1_87db30d3-f829-4cf1-8340-5e2f6134d5a1.jpg?13140846413265117893'); height: 100%; 
+
+                                   /* Create the parallax scrolling effect */
+                                   background-attachment: fixed;
+                                   background-position: top;
+                                   background-repeat: no-repeat;
+                                   background-size: cover;margin-top:0px; padding-top:40px;">
+    
+  {% endif %}
+    {% if page.handle == "contact-us"%}
+    <div class="main-content" style="background: url(https://cdn.shopify.com/s/files/1/2135/4653/files/flexfit_trucker_-_grey_black.jpg?3712776969542086372);
+                                     height: 100%;
+                                     background-attachment: fixed;
+                                     /* background-position: top; */
+                                     background-repeat: no-repeat;
+                                     background-size: contain;
+                                     margin: 0px;
+                                     padding-top: 40px;">
+
+    
+    <style>.template-page .page-content > :not(.highlight) {
+    max-width: 53%!important;
+    margin-left: auto;
+    margin-right: auto;</style>
+  
+    {% endif %}
+    {% if page.handle == "shipping-return"%}
+    <div class="main-content" style="background: url(https://cdn.shopify.com/s/files/1/2135/4653/files/home_page_scrolling_pic___5.jpg?17091578090113026563);
+                                     height: 100%;
+                                     background-attachment: fixed;
+                                     background-position: left;
+                                     background-repeat: no-repeat;
+                                     background-size: contain;
+                                     margin: 0px;
+                                     padding-top: 40px;">
+    {% endif %}
+      {% if page.handle == "terms-conditions" %}
+      
+      <div class="main-content" style="background: url(https://cdn.shopify.com/s/files/1/2135/4653/files/impact_crop_-_black_cover_pic.jpg?1034279855142541841);
+                                       height: 100%;
+                                       background-attachment: fixed;
+                                       background-position: top;
+                                       background-repeat: no-repeat;
+                                       background-size: cover;
+                                       margin: 0px;
+                                       padding-top: 40px;">
+      {% endif %}
+        
+        {% if page.handle == "privacy-policy" %}
+        <div class="main-content" style="background: url(https://cdn.shopify.com/s/files/1/2135/4653/files/flexfit_trucker_-_grey_black.jpg?3712776969542086372);
+                                         height: 100%;
+                                         background-attachment: fixed;
+                                         /* background-position: top; */
+                                         background-repeat: no-repeat;
+                                         background-size: contain;
+                                         margin: 0px;
+                                         padding-top: 40px;">
+     {% endif %}
+     {% if shop.url contains "apps/help-center" %}
+		<div class="main-content" style="background: url(https://cdn.shopify.com/s/files/1/2135/4653/files/flexfit_trucker_-_grey_black.jpg?3712776969542086372);
+                                            height: 100%;
+                                            background-attachment: fixed;
+                                            /* background-position: top; */
+                                            background-repeat: no-repeat;
+                                            background-size: contain;
+                                            margin: 0px;
+                                            padding-top: 40px;">
+	{% endif %}
+           
+  <div class="main-content" >
+   
+  {{ content_for_layout }}
+  {% section 'footer' %}
+
+  <!-- Scripts -->
+  {{ 'jquery-1.11.1.min.js' | asset_url | script_tag }}
+  {{ 'api.jquery.js' | shopify_asset_url | script_tag }}
+
+  {% if template contains 'cart' %}
+    {{ "/services/javascripts/countries.js" | script_tag }}
+    {{ "shopify_common.js" | shopify_asset_url | script_tag }}
+    {{ 'jquery.cart.min.js' | asset_url | script_tag }}
+  {% endif %}
+
+  {% if template contains 'customers' %}
+    {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+    {{ 'customer_area.js'  | shopify_asset_url | script_tag }}
+  {% endif %}
+
+  {% if settings.currency-switcher %}
+    {{ "//cdn.shopify.com/s/javascripts/currencies.js" | script_tag }}
+    {{ "jquery.currencies.js" | asset_url | script_tag }}
+  {% endif %}
+
+  {{ 'plugins.js'  | asset_url | script_tag }}
+  {{ 'theme.js'  | asset_url | script_tag }}
+  
+  <!-- continue shopping button going back to last collection viewed -->
+  <script>  
+    if(Storage !== undefined) {
+
+      {% if template contains 'collection' %}
+      sessionStorage.collection = "{{ collection.url }}";
+      {% endif %}
+
+      if(sessionStorage.collection === undefined){
+        sessionStorage.collection = "/collections/all";
+      }
+
+    {% if template contains 'cart' %}
+      document.getElementById("continue-shopping").href = sessionStorage.collection;
+    {% endif %}
+
+    }
+
+  </script>
+  <!-- Ends continue shopping button going back to last collection viewed -->
+  <!-- includes ajaxify -->
+ 
+
+{% include 'wholesale-now' %}
+{% include 'preorder-now' %}
+  </body>
+</html>

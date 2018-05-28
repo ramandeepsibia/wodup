@@ -1,0 +1,841 @@
+
+{% include 'breadcrumbs' %}
+
+{% assign product_id = product.id %}
+{% assign variant = product.selected_or_first_available_variant %}
+
+{% assign use_zoom = false %}
+{% if section.settings.zoom %}
+  {% assign use_zoom = true %}
+{% endif %}
+
+{% assign use_slideshow = false %}
+{% if section.settings.images-layout == 'slideshow' %}
+  {% assign use_slideshow = true %}
+{% endif %}
+
+{% assign use_masonry = false %}
+{% if section.settings.page-layout == 'masonry' %}
+  {% assign use_masonry = true %}
+  {% assign use_slideshow = false %}
+{% endif %}
+
+{% assign related_products_position = section.settings.related-products-position %}
+{% if use_masonry %}
+  {% comment %}Related products in masonry grid must be below product{% endcomment %}
+  {% assign related_products_position = 'below' %}
+{% endif %}
+
+{% if collection == null or collection.handle == 'frontpage' or collection.handle == 'all' %}
+  {% assign found_a_collection = false %}
+  {% for c in product.collections %}
+    {% if found_a_collection == false and c.handle != 'frontpage' and c.handle != 'all' %}
+      {% assign found_a_collection = true %}
+      {% assign collection = c %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<section
+  class="main-product-wrap
+    product-wrap
+    {% if section.settings.related-products %}related-products-position-{{ related_products_position }}{% endif %}"
+  itemscope
+  itemtype="http://schema.org/Product"
+  data-product-id="{{ product_id }}"
+  {% unless use_slideshow %}data-images-list-view{% endunless %}
+  {% if section.settings.zoom %}data-zoom{% endif %}
+  {% if section.settings.linked-options %}data-linked-options{% endif %}
+  {% if section.settings.ajax %}data-ajax{% endif %}
+  {% if use_masonry %}data-product-masonry{% endif %}
+  data-section-id="{{ section.id }}"
+  data-section-type="product">
+
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+  <meta itemprop="image" content="{{ product | img_url: 'grande' }}">
+
+  <div style="border:0px solid red"
+    class="product-images {% if use_masonry %}product-images-masonry{% endif %}"
+    {% if use_masonry and product.images.size > 1 %}data-masonry-gallery{% endif %}
+  >
+    {% if use_masonry and product.images.size > 1 %}
+      <div class="product-image-masonry-sizer" data-masonry-image-sizer></div>
+    {% endif %}
+
+    {% if use_slideshow %}
+
+      <div class="product-main-image">
+        {% assign main_image = variant.image | default: product.featured_image %}
+        {% assign main_image_alt = product.title %}
+        {% if main_image.alt != blank %}
+          {% assign main_image_alt = main_image.alt %}
+        {% endif %}
+
+        {% if main_image != blank %}
+          <img
+            src="{{ main_image | img_url: '1024x1024' }}"
+            alt="{{ main_image_alt | escape }}"
+           >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {% endif %}
+
+        {% if section.settings.zoom %}
+          <div class="product-zoom"></div>
+        {% endif %}
+      </div>
+
+      {% if product.images.size > 1 %}
+        <div class="product-thumbnails-outer-wrapper">
+          {% if product.images.size > 4 %}
+            <span class="product-thumbnails-navigation-previous">&#xe601;</span>
+          {% endif %}
+          <div class="product-thumbnails-wrapper">
+            <div class="product-thumbnails {% if product.images.size > 4 %}has-side-scroll{% endif %}">
+              {% for image in product.images %}
+                <div class="product-thumbnail {% if mainImage == image %}active{% endif %}">
+                  <img
+                    alt="{{ image.alt | escape }}"
+                    data-high-res="{{ image | img_url: '1024x1024' }}"
+                    src="{{ image | img_url: 'compact' }}"
+                    data-image-id="{{ image.id }}"
+                  >
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% if product.images.size > 4 %}
+            <span class="product-thumbnails-navigation-next">&#xe600;</span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    {% else %}
+
+
+      {%- for image in product.images -%}
+        {% assign use_large_image = false %}
+        {% if product.images.size == 2 %}
+          {% assign use_large_image = true %}
+        {% elsif forloop.first and use_masonry %}
+          {% assign use_large_image = true %}
+        {% endif %}
+
+        {% assign image_alt = product.title %}
+        {% if image.alt != blank %}
+          {% assign image_alt = image.alt %}
+        {% endif %}
+
+        <div class="product-image {% if use_large_image %}product-image-wide{% endif %}">
+          <img
+            src="{{ image | img_url: '1024x1024' }}"
+            alt="{{ image_alt | escape }}"
+            data-image-id="{{ image.id }}"
+          >
+        </div>
+      {%- endfor -%}
+
+    {% endif %}
+    </div>
+    
+	
+  
+  
+
+  <div class="product-details-wrapper" >
+    
+    
+    
+     
+    <div class="product-details" style="border:0px solid red;">
+
+      {% if section.settings.vendor %}
+        <a class="product-vendor" href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+      {% endif %}
+      <h1 class="product-title" itemprop="name">{{ product.title }}</h1>
+      <p class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+
+        <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+        <meta itemprop="price" content="{{ product.price_min | money_without_currency }}">
+
+        <span class="product-price-minimum money">
+          {{ variant.price | money }}
+        </span>
+
+        <span
+          class="product-price-compare money original {% if variant.compare_at_price > variant.price %}visible{% endif %}"
+        >
+          {{ variant.compare_at_price | money }}
+        </span>
+        
+        <!-- Begin Afterpay Liquid Snippet for Shopify v2.1.2 -->
+{% assign afterpay_minimum_value_in_cents = 4 %}
+{% assign afterpay_maximum_value_in_cents = 100000 %}
+{% assign afterpay_logo_theme = 'colour' %}
+{% assign afterpay_count_eligible_variants = 0 %}
+{% if shop.currency == 'AUD' %}
+  {% for afterpay_variant in product.variants %}
+    {% if afterpay_variant.available and afterpay_variant.price >= afterpay_minimum_value_in_cents and afterpay_variant.price <= afterpay_maximum_value_in_cents %}
+      {% assign afterpay_count_eligible_variants = afterpay_count_eligible_variants | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+<script type="text/javascript">
+(
+  function(i,s,o,g,r,a,m){
+    i['GoogleAnalyticsObject']=r;
+    i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments);
+    },i[r].l=1*new Date();
+    a=s.createElement(o),m=s.getElementsByTagName(o)[0];
+    a.async=1;
+    a.src=g;
+    m.parentNode.insertBefore(a,m);
+  }
+)(window,document,'script','https://www.google-analytics.com/analytics.js','afterpay_ga');
+afterpay_ga('create', 'UA-108913162-1', 'auto');
+afterpay_ga('send', 'event', 'Liquid Snippet', 'Report Version', '2.1.2');
+afterpay_ga('send', 'event', 'Theme', 'Report Name', {{ theme.name | json }});
+</script>
+{% if afterpay_count_eligible_variants > 0 %}
+  <p class="afterpay-paragraph" style="display:{% if product.selected_or_first_available_variant.available and product.selected_or_first_available_variant.price >= afterpay_minimum_value_in_cents and product.selected_or_first_available_variant.price <= afterpay_maximum_value_in_cents %}block{% else %}none{% endif %};" data-product-id="{{ product.id }}">
+    or make 4 interest-free payments of
+    <strong><span class="afterpay-instalments">${{ product.selected_or_first_available_variant.price | divided_by: 4.0 | round | money_without_currency }}&nbsp;AUD</span></strong>
+    fortnightly with 
+    <a style="display:inline-block; margin-bottom:10px;" href="https://www.afterpay.com/terms" rel="nofollow" target="_blank">
+      <img style="vertical-align:middle;" src="https://static.afterpay.com/integration/product-page/logo-afterpay-{{ afterpay_logo_theme }}.png" srcset="https://static.afterpay.com/integration/product-page/logo-afterpay-{{ afterpay_logo_theme }}.png 1x, https://static.afterpay.com/integration/product-page/logo-afterpay-{{ afterpay_logo_theme }}@2x.png 2x, https://static.afterpay.com/integration/product-page/logo-afterpay-{{ afterpay_logo_theme }}@3x.png 3x" width="100" height="21" alt="Afterpay" />
+      <span style="font-size:12px;"><u>More info</u></span>
+    </a>
+  </p>
+  {% if product.price_varies or afterpay_count_eligible_variants < product.variants.size %}
+    <script type="text/javascript">
+      if (typeof Afterpay === 'undefined') {
+        var Afterpay = {products:[]};
+        Afterpay.loadScript = function(url, callback) {
+          var script = document.createElement('script');
+          script.type = 'text/javascript';
+          if (script.readyState) { // I.E.
+            script.onreadystatechange = function() {
+              if (script.readyState == 'loaded' || script.readyState == 'complete') {
+                script.onreadystatechange = null;
+                callback();
+              }
+            };
+          } else { // Others
+            script.onload = function() {
+              callback();
+            };
+          }
+          script.src = url;
+          document.getElementsByTagName('head')[0].appendChild(script);
+        };
+        Afterpay.init = function($) {
+          $('body').on('change', $('form[action^="/cart/add"]'), function(event) {
+            var $form = $(event.target).closest('form');
+            var $afterpay_paragraph = null;
+            var should_show_instalments = false;
+            var selected_variant_id = parseInt($('input[name=id]:checked, select[name=id], input[name=id], hidden[name=id]', $form).val(), 10);
+            if (isNaN(selected_variant_id)) {
+              var $variant_options = $form.find('input[name=id][value], select[name=id] option[value], hidden[name=id][value]').filter(function(index, element) {
+                return $(element).attr('value').match(/^[1-9][0-9]*$/);
+              });
+              $variant_options.each(function(index, element) {
+                $.each(Afterpay.products, function(product_index, product) {
+                  $.each(product.variants, function(variant_index, variant) {
+                    if (variant.id == $(element).val()) {
+                      $afterpay_paragraph = $('.afterpay-paragraph[data-product-id=' + product.id + ']');
+                      return false;
+                    }
+                  });
+                  if ($afterpay_paragraph !== null) {
+                    return false;
+                  }
+                });
+                if ($afterpay_paragraph !== null) {
+                  return false;
+                }
+              });
+            } else if (selected_variant_id > 0) {
+              $.each(Afterpay.products, function(product_index, product) {
+                $.each(product.variants, function(variant_index, variant) {
+                  if (variant.id == selected_variant_id) {
+                    $afterpay_paragraph = $('.afterpay-paragraph[data-product-id=' + product.id + ']');
+                    if (variant.available && variant.price >= {{ afterpay_minimum_value_in_cents }} && variant.price <= {{ afterpay_maximum_value_in_cents }}) {
+                      should_show_instalments = true;
+                      $afterpay_paragraph.find('.afterpay-instalments').html('$' + (Math.round(variant.price / 4) / 100).toFixed(2) + '&nbsp;AUD');
+                    }
+                  }
+                });
+              });
+            }
+            if ($afterpay_paragraph !== null) {
+              if (should_show_instalments) {
+                $afterpay_paragraph.show();
+              } else {
+                $afterpay_paragraph.hide();
+              }
+            }
+          });
+        };
+        if (typeof jQuery === 'undefined' || parseFloat(jQuery.fn.jquery) < 1.7) {
+          Afterpay.loadScript('https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js', function() {
+            var jQuery_1_12_4 = jQuery.noConflict(true);
+            Afterpay.init(jQuery_1_12_4);
+          });
+        } else {
+          Afterpay.init(jQuery);
+        }
+      }
+      Afterpay.products.push({{ product | json }});
+    </script>
+  {% endif %}
+{% endif %}
+<!-- End Afterpay Liquid Snippet for Shopify v2.1.2 -->
+
+        {% if product.available %}
+          <link itemprop="availability" href="http://schema.org/InStock">
+        {% else %}
+          <link itemprop="availability" href="http://schema.org/OutOfStock">
+        {% endif %}
+
+      </p>
+
+      <form class="product-form"
+        id="product-form-{{ product_id }}"
+        action="/cart/add"
+        method="post"
+        data-product-form="{{ product_id }}"
+      >
+        {% if product.variants.size > 1 %}
+         <div class="product-options">
+            {%-
+              include 'product-options-dropdown',
+              form_id: product_id
+            -%}
+
+            <div class="selector-wrapper no-js-required">
+              <label for="product-select-{{ product_id }}"></label>
+              <select
+                class="product-select"
+                name="id"
+                id="product-select-{{ product_id }}"
+                data-select-ignore
+              >
+                {% for variant in product.variants %}
+                  {% if variant.available %}
+                    <option
+                      {% if variant == selected_variant %}selected="selected"{% endif %}
+                      value="{{ variant.id }}" data-variant-id="{{ variant.id }}" data-sku="{{ variant.sku }}">
+                      {{ variant.title }} - {{ variant.price | money }}
+                    </option>
+                  {% else %}
+                    <option disabled="disabled" data-variant-id="{{ variant.id }}" value="{{ variant.id }}">
+                      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        {% else %}
+          <input
+            class="product-select"
+            name="id"
+            value="{{ product.variants[0].id }}"
+            type="hidden"
+            data-variant-title="{{ product.variants[0].title }}" />
+        {% endif %}
+
+        {% if product.available %}
+
+          <div id="infiniteoptions-container"></div>
+          <div id="uploadery-container"></div>
+
+          <div class="product-quantity inline-input-wrapper">
+            <label>{{ 'general.general.quantity' | t }}</label>
+            <input type="text" name="quantity" value="1" />
+          </div>
+        {% endif %}
+
+        {% if section.settings.share-buttons %}
+          {% include 'share-buttons' %}
+        {% endif %}
+
+        <div class="add-to-cart">
+          {% if variant.available %}
+            <input type="submit" value="{{ 'products.product.add_to_cart' | t }}" />
+          {% else %}
+            <input type="submit" class="disabled" disabled="disabled" value="{{ 'products.product.sold_out' | t }}" />
+          {% endif %}
+        </div>
+
+        <div class="product-message"></div>
+
+     
+      
+ </form>
+    </div>
+    <div class="product-description rte" itemprop="description">
+         
+            <div class="product_tabs">
+              <ul class="tabs">
+                <li><a href="#tab-1">Description</a></li>
+                {% if product.metafields.product.size != 'none' %}
+                <li><a href="#tab-2"> Size Guide </a></li>
+                {% endif %}
+                <li><a href="#tab-3">Shipping  	&amp; Return</a></li>
+                <li><a href="#tab-4">Reviews</a></li>
+              </ul>
+              <div id="tab-1">
+                {% if product.description != blank %}
+              		{{ product.description }}
+                {% endif %}
+              </div>
+              
+              {% if product.metafields.product.size != 'none' %}
+
+                     
+
+                
+              <div id="tab-2">
+                
+                {% if product.metafields.product.size %}
+                
+                  <div class="fortify-gear-size-guide">
+                    {% if product.metafields.product.size != ' 1 ' %}
+
+                       {{product.metafields.product.size}}
+
+                  	{% endif %}
+                    
+                    </div>
+                
+                {% endif %}
+                
+                {% if product.metafields.product.size-img %}
+                	<style>
+                      .fortify-gear-size-guide{display:none;}
+                	</style>
+                	<img src="{{product.metafields.product.size-img}}" />
+                
+                {% endif %}
+                
+                {% if product.metafields.product.size-img2 %}
+                	
+                	<img src="{{product.metafields.product.size-img2}}" />
+                
+                {% endif %}
+                
+                 {% if product.metafields.product.size-img3 %}
+                	
+                	<img src="{{product.metafields.product.size-img3}}" />
+                
+                {% endif %}
+                
+                
+               	{% assign found = false %}
+            	{% assign found1 = false %}
+                {% assign found2 = false %}
+                {% assign found3 = false %}
+                
+                {% for c in product.collections %}
+                  {% if c.handle == 'womens-apparel' %}
+                    {% assign found = true %}
+                    {% assign found1 = true %}
+                	{% assign found2 = true %}
+                	
+                  {% elsif c.handle == 'clothing' %}
+                    {% assign found = true %}
+                    {% assign found1 = true %}
+                	{% assign found2 = true %}
+                  {% elsif c.handle == 'men' %}
+                  	{% assign found = true %}
+                	{% assign found3 = true %}
+                	
+                
+                  {% endif %}
+                {% endfor %}
+                
+                {% if found == true and found1 == true %}
+                 {% assign var1 = pages.general-guideline-measurments.content %}
+                {% assign var2 = pages.wodup-womens-inseam.content %}
+                {% assign var3 = pages.wodup-unisex-top-end-measurements.content %}
+              <!--  <div>{{var1}}</div>
+                <div>{{var2}}</div>
+                <div>{{var3}}</div>-->
+                
+                {% elsif found3 == true %}
+                {% assign var4 = pages.wodup-unisex-top-end-measurements.content %}
+                {% assign var5 = pages.wodup-mens-bottom-measurements.content %}
+               <!-- <div>{{var4}}</div>
+                <div>{{var5}}</div> -->
+                
+                {% elsif found == true %}
+                		<!--{{ pages.general-guideline-measurments.content }}-->
+                <h1>hello</h1>
+                {% endif %}  
+              </div>
+                {% endif %}
+              <div id="tab-3">
+               {{ pages.shipping-return.content }}
+              </div>
+              <div id="tab-4">
+             <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+              </div>
+            </div>
+<div class="accordion">
+    <div class="accordion-section">
+        <a class="accordion-section-title" href="#accordion-1">Description</a>
+         
+        <div id="accordion-1" class="accordion-section-content">
+             {% if product.description != blank %}
+              {{ product.description }}
+                {% endif %}
+        </div><!--end .accordion-section-content-->
+    </div><!--end .accordion-section-->
+     {% if product.metafields.product.size != 'none' %}
+  		<div class="accordion-section">
+          <a class="accordion-section-title" href="#accordion-2">Size Guide</a>
+          <div id="accordion-2" class="accordion-section-content">
+           
+            {% if product.metafields.product.size %}
+                
+                  <div class="fortify-gear-size-guide">
+                    {% if product.metafields.product.size != ' 1 ' %}
+
+                       {{product.metafields.product.size}}
+
+                  	{% endif %}
+                    
+                    </div>
+                
+                {% endif %}
+                
+                {% if product.metafields.product.size-img %}
+                	<style>
+                      .fortify-gear-size-guide{display:none;}
+                	</style>
+                	<img src="{{product.metafields.product.size-img}}" />
+                
+                {% endif %}
+                
+                {% if product.metafields.product.size-img2 %}
+                	
+                	<img src="{{product.metafields.product.size-img2}}" />
+                
+                {% endif %}
+                
+                 {% if product.metafields.product.size-img3 %}
+                	
+                	<img src="{{product.metafields.product.size-img3}}" />
+                
+                {% endif %}
+            
+            
+            
+            
+            
+            
+            
+            <!-- {% assign found = false %}
+            	{% assign found1 = false %}
+                {% assign found2 = false %}
+                {% assign found3 = false %}
+                
+                {% for c in product.collections %}
+                  {% if c.handle == 'womens-apparel' %}
+                    {% assign found = true %}
+                    {% assign found1 = true %}
+                	{% assign found2 = true %}
+                	
+                  {% elsif c.handle == 'clothing' %}
+                    {% assign found = true %}
+                    {% assign found1 = true %}
+                	{% assign found2 = true %}
+                  {% elsif c.handle == 'men' %}
+                  	{% assign found = true %}
+                	{% assign found3 = true %}
+                	
+                
+                  {% endif %}
+                {% endfor %}
+                
+                {% if found == true and found1 == true %}
+                 {% assign var1 = pages.general-guideline-measurments.content %}
+                {% assign var2 = pages.wodup-womens-inseam.content %}
+                {% assign var3 = pages.wodup-unisex-top-end-measurements.content %}
+                <div>{{var1}}</div>
+                <div>{{var2}}</div>
+                <div>{{var3}}</div>
+                
+                {% elsif found3 == true %}
+                {% assign var4 = pages.wodup-unisex-top-end-measurements.content %}
+                {% assign var5 = pages.wodup-mens-bottom-measurements.content %}
+                <div>{{var4}}</div>
+                <div>{{var5}}</div>
+                
+                {% elsif found == true %}
+                		{{ pages.general-guideline-measurments.content }}
+                <h1>hello</h1>
+                {% endif %}  -->
+            <!--<div class="w3-content" style="max-width:1200px">
+            <img class="mySlides" src="img_nature_wide.jpg" style="width:100%">
+            <img class="mySlides" src="img_fjords_wide.jpg" style="width:100%">
+            <img class="mySlides" src="img_mountains_wide.jpg" style="width:100%">
+
+            <div class="w3-row-padding w3-section">
+              <div class="w3-col s4">
+                <img class="demo w3-opacity w3-hover-opacity-off" src="img_nature_wide.jpg" style="width:100%" onclick="currentDiv(1)">
+              </div>
+              <div class="w3-col s4">
+                <img class="demo w3-opacity w3-hover-opacity-off" src="img_fjords_wide.jpg" style="width:100%" onclick="currentDiv(2)">
+              </div>
+              <div class="w3-col s4">
+                <img class="demo w3-opacity w3-hover-opacity-off" src="img_mountains_wide.jpg" style="width:100%" onclick="currentDiv(3)">
+              </div>
+            </div>
+          </div>-->
+
+              
+          </div><!--end .accordion-section-content-->
+      </div><!--end .accordion-section-->
+  
+  {% endif %}
+  <div class="accordion-section">
+        <a class="accordion-section-title" href="#accordion-3">Shipping &amp; Return</a>
+         
+        <div id="accordion-3" class="accordion-section-content">
+          {{ pages.shipping-return.content }}
+        </div><!--end .accordion-section-content-->
+    </div><!--end .accordion-section-->
+  
+   <div class="accordion-section">
+        <a class="accordion-section-title" href="#accordion-4">Reviews</a>
+         
+        <div id="accordion-4" class="accordion-section-content">
+         <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+        </div><!--end .accordion-section-content-->
+    </div><!--end .accordion-section-->
+</div><!--end .accordion-->
+      
+      
+
+        </div>
+    
+    
+  
+  </div>
+  
+   {% assign addToCartText = 'products.product.add_to_cart' | t %}
+
+  {%
+    include 'product-json',
+    id: product_id,
+    add_to_cart_text: addToCartText,
+    enable_history: true
+  %}
+ 
+
+{% if section.settings.show_share_buttons %}
+  {% include 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product %}
+{% endif %}
+
+</section>
+
+<div style="height:34px;"></div>  
+  <!-- starts -->
+  <div style="width:100%; padding:30px;" class="theUpperSection">
+    <div class="also-available-section">
+    <h2 class="section-title" style="text-align:center; text-transform: uppercase; border-bottom: 1px solid #2ca5cb;">Also Available in...</h2>
+      {% assign showFullRelatedProducts = "0" %}
+      {% for article in blogs.also-available-in-collection.articles limit: 48 %}
+      
+      {% capture title %}{{ article.title }}{% endcapture %}
+       {% if article.title == product.handle %}    
+      
+       		{% capture theOtherProductVariant %}{{ article.content }}{% endcapture %}
+      
+            {% for tag in article.tags %}
+            
+      
+              {% for article in blogs.also-available-in-collection.articles limit: 48 %}
+      
+               
+                 {% if article.title == tag %}  
+      {{article.title}}
+      
+      <!--PRODUCT LOOP GOES HERE-->
+    
+
+
+
+
+
+<div class="grid-uniform product-grid">
+  {% for product in collections['all'].products %}
+  
+  {{product.title}}
+  
+  {% if product.title == article.title %}
+  
+  Hey found you
+  
+  {% endif %}
+  
+  
+  {% endfor %}
+</div>
+
+      
+      
+      
+      
+      				{{ article.content }} 
+
+                {% endif %}
+      
+      			{% assign showFullRelatedProducts = "1" %}
+      
+      		 {% endfor %}
+
+            {% endfor %}
+       
+       {% endif %}
+      {% endfor %}
+      
+
+    
+    </div>
+    
+    
+      
+  
+    
+    <div class="related-products-section">
+      
+       {% if showFullRelatedProducts == '0' %}
+     
+    
+      <style>.also-available-section{display:none}.related-products-section{width:100%;padding:0px;}</style>
+      {% if section.settings.related-products %}
+        {%
+          include 'related-products'
+          related_products_position: related_products_position,
+          related_collection: collection,
+          current_product_id: product_id,
+          use_masonry: use_masonry
+        %}
+      {% endif %}
+      
+    
+   {% else %} 
+      
+      {% if section.settings.related-products %}
+        {%
+          include 'related-products-aside'
+          related_products_position: related_products_position,
+          related_collection: collection,
+          current_product_id: product_id,
+          use_masonry: use_masonry
+        %}
+      {% endif %}
+      
+  
+    
+    {% endif %}
+    
+      </div>
+    <div style="clear:both;"></div>
+  </div>
+    <!-- ends -->
+  
+
+ 
+
+{% schema %}
+{
+  "name": "Product pages",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "vendor",
+      "label": "Show vendor name"
+    },
+    {
+      "type": "select",
+      "id": "page-layout",
+      "label": "Page layout",
+      "options": [
+        {
+          "value": "default",
+          "label": "Grid (Default)"
+        },
+        {
+          "value": "masonry",
+          "label": "Masonry"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "select",
+      "id": "images-layout",
+      "label": "Images layout",
+      "info": "This only applies to grid layout",
+      "options": [
+        {
+          "value": "slideshow",
+          "label": "Slideshow"
+        },
+        {
+          "value": "list-view",
+          "label": "List view"
+        }
+      ],
+      "default": "slideshow"
+    },
+    {
+      "type": "checkbox",
+      "id": "zoom",
+      "label": "Enable image zoom",
+      "info": "The image zoom functionality only works with the slideshow layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "related-products",
+      "label": "Show related products"
+    },
+    {
+      "type": "select",
+      "id": "related-products-position",
+      "label": "Align related products",
+      "info": "This only applies to grid layout",
+      "options": [
+        {
+          "value": "below",
+          "label": "Below product info"
+        },
+        {
+          "value": "right",
+          "label": "Right of product info"
+        }
+      ],
+      "default": "below"
+    },
+    {
+      "type": "checkbox",
+      "id": "ajax",
+      "label": "Add product to cart without leaving product page"
+    },
+    {
+      "type": "header",
+      "content": "Show sharing icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "share-buttons",
+      "label": "Show share icons"
+    }
+  ]
+}
+{% endschema %}

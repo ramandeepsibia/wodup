@@ -1,0 +1,10 @@
+
+{% if settings.alternative-index-layout %}
+
+  {% layout 'alternative' %}
+
+{% else %}
+
+  {{ content_for_index }}
+
+{% endif %}

@@ -1,0 +1,209 @@
+{%- assign feature_count = section.blocks.size -%}
+{%- assign featureIndex = 0 -%}
+
+{%- if feature_count == 0 -%}
+  {%- assign feature_count = 6 -%}
+{%- endif -%}
+
+<section
+  class="home-masonry
+    home-masonry-feature-count-{{ feature_count }}
+    home-masonry-layout-{{ section.settings.layout }}
+    {% if onboard %}home-masonry-onboard{% endif %}
+    {% if section.settings.gutters %}home-masonry-gutters{% endif %}
+    {% if section.settings.hover %}home-masonry-hover{% endif %}
+    {% if section.settings.hover-animation %}home-masonry-hover-animation{% endif %}"
+  data-masonry-layout="{{ section.settings.layout }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="home-masonry">
+  {%- unless section.blocks.size == 0 -%}
+    {%- for block in section.blocks -%}
+      {%- include 'home-masonry-feature' -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for i in (1..feature_count) -%}
+      {%-
+        include 'home-masonry-feature',
+        onboarding: true
+      -%}
+    {%- endfor -%}
+  {%- endunless -%}
+</section>
+
+{% schema %}
+{
+  "name": "Masonry",
+  "class": "section-masonry",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "content-width",
+          "label": "Content width"
+        },
+        {
+          "value": "full-width",
+          "label": "Full width"
+        }
+      ],
+      "default": "content-width"
+    },
+    {
+      "type": "checkbox",
+      "id": "gutters",
+      "label": "Enable gutters",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hover",
+      "label": "Enable text hover",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hover-animation",
+      "label": "Enable hover animation",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image_feature",
+      "name": "Image feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Masonry feature"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Showcase up to six features with overlaying text"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Text color",
+          "options": [
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            }
+          ],
+          "default": "black"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1400 x 640px recommended"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "video_feature",
+      "name": "Video feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Video feature"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Showcase up to six features with overlaying text"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Text color",
+          "options": [
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            }
+          ],
+          "default": "black"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "YouTube or Vimeo link",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "1400 x 700px recommended"
+        },
+        {
+          "type": "checkbox",
+          "id": "mobile",
+          "label": "Show on mobile",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "category": "Image",
+      "name": "Masonry",
+      "blocks": [
+        {
+          "type": "image_feature"
+        },
+        {
+          "type": "image_feature"
+        },
+        {
+          "type": "image_feature"
+        },
+        {
+          "type": "image_feature"
+        },
+        {
+          "type": "image_feature"
+        },
+        {
+          "type": "image_feature"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

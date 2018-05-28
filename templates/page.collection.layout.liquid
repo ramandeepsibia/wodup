@@ -1,0 +1,110 @@
+<div class="page-width">
+  <div class="grid">
+    <div class="grid__item medium-up--five-sixths medium-up--push-one-twelfth">
+      <div class="section-header text-center">
+       
+
+      </div>
+
+      <div class="rte">
+      
+        <div class="product_layout">
+          <div class="banner_left">
+            {{ page.content }}
+          </div>  
+          <div class="product_layout_rightt" id="collections-listing">
+            {% if linklists.featured-collections.links.size > 0 %}
+              <ul class="product_layout_right">
+              {% for link in linklists.featured-collections.links limit:4%}
+              {% assign collection = link.object %}
+              {% unless collection.handle == 'collections' %}
+                <li class="{{ collection.handle }}-collection product_first_right">      
+                {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+                  <div class="collection">
+                    <div class="collection-image">
+                      <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                        {% if collection.image %}
+                          {{ collection.image.src | collection_img_url: 'large' | img_tag: collection_title }}{% else %}
+                          {{ collection.products.first.featured_image | product_img_url: 'large' | img_tag: collection_title }}
+                        {% endif %}
+
+                      </a>
+                    </div><!-- end of .collection-image -->
+                    <div class="collection-description">
+                      <h6>
+                        <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                          {{ collection.title }}
+                        </a>
+                        
+                      </h6>
+                    </div><!-- end of .collection-description -->
+                  </div><!-- end of .collection -->
+                </li>
+              {% endunless %}
+              {% endfor %}
+              </ul> 
+            {% else %}
+            <p>Please {{ 'create a link list' | link_to: '/admin/links' }} that contains links to all the collections you wish to feature on this page. The title of that link list must be <strong>Featured Collections</strong>. If you want your collections to be listed alphabetically, reorder them alphabetically on your {{ 'Navigation page' | link_to: '/admin/links' }}.</p>{% endif %}
+          </div><!-- end of #collection-listing -->
+          </div>
+          <div class="bottom_products">
+              <ul class="product_layout_bottom">
+              {% for link in linklists.featured-collections.links offset:4%}
+              {% assign collection = link.object %}
+              {% unless collection.handle == 'collections' %}
+                <li class="{{ collection.handle }}-collection product_first_bottom">      
+                {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+                  <div class="collection">
+                    <div class="collection-image">
+                      <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                       {% if collection.image %}
+                          {{ collection.image.src | collection_img_url: 'large' | img_tag: collection_title }}{% else %}
+                          {{ collection.products.first.featured_image | product_img_url: 'large' | img_tag: collection_title }}
+                       {% endif %}
+                      </a>
+                    </div><!-- end of .collection-image -->
+                    <div class="collection-description">
+                      <h6>
+                        <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                          {{ collection.title }}
+                        </a>
+                        
+                      </h6>
+                    </div><!-- end of .collection-description -->
+                  </div><!-- end of .collection -->
+                </li>
+              {% endunless %}
+              {% endfor %}
+                
+                
+                <li>      
+               
+                  <div class="collection">
+                    <div class="collection-image">
+                      <a href="/">
+                       <img  alt="Wodup Logo" src="https://cdn.shopify.com/s/files/1/2135/4653/files/wodup-logo.png?17765098171569510514">
+                      </a>
+                    </div><!-- end of .collection-image -->
+                    <div class="collection-description" style="display:none;">
+                      <h6>
+                        <a href="{{ collection.url }}" title="Browse our {{ collection_title }} collection">
+                          {{ collection.title }}
+                        </a>
+                        
+                      </h6>
+                    </div><!-- end of .collection-description -->
+                  </div><!-- end of .collection -->
+                </li>
+                
+              </ul>
+  
+          </div>
+        </div>  
+      </div>
+       
+
+    </div>
+
+ </div>
+
+

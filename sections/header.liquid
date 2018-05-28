@@ -1,0 +1,362 @@
+{%- capture arrow_right -%}
+  {%-
+    include 'icons',
+    id: 'chevron-right'
+  -%}
+{%- endcapture -%}
+
+{% assign mega_nav_handle = section.settings.mega-nav-handle %}
+
+{%- capture header_classes -%}
+  header
+  header-layout-{{ section.settings.header_layout }}
+
+  {% if section.settings.header_full_width %}
+    header-full-width
+  {% else %}
+    header-content-width
+  {% endif %}
+
+  {% if section.settings.sticky_header and section.settings.sticky_header_logo and section.settings.logo %}
+    header-sticky-show-logo
+  {% endif %}
+
+  {% if section.settings.header_border and template != 'index' %}
+    header-border
+  {% endif %}
+{%- endcapture -%}
+
+<section
+  class="{{ header_classes | replace: '  ', ' ' | strip_newlines }}"
+  {% if section.settings.sticky_header %}data-sticky-header{% endif %}
+  {% if section.settings.header_layout == 'compact-center' %}data-header-compact-center{% endif %}
+  data-section-id="{{ section.id }}"
+  data-section-type="header">
+  <header
+    class="main-header"
+    role="banner"
+    data-header-main
+  >
+    <div class="header-tools-wrapper">
+      <div class="header-tools">
+
+        <div class="aligned-left">
+          <div id="coin-container"></div>
+          <div data-header-currency-switcher>
+            {% if settings.currency-switcher %}
+            <div class="currency-wrapper">
+              <span class="select-currency">
+                {{ 'layout.header.select_currency' | t }}
+              </span>
+              <span class="select-wrapper currency-switcher">
+                <span class="selected-currency"></span>
+                <select id="currencies" name="currencies">
+                  {% capture codes %},USD,EUR,GBP,CAD,ARS,AUD,BBD,BDT,BSD,BHD,BRL,BOB,BND,BGN,ILS,MMK,KYD,CLP,CNY,COP,CRC,HRK,CZK,DKK,DOP,XCD,EGP,XPF,FJD,GHS,GTQ,GYD,GEL,HKD,HUF,ISK,INR,IDR,NIS,JMD,JPY,JOD,KZT,KES,KWD,LVL,LTL,MXN,MYR,MUR,MDL,MAD,MNT,MZN,ANG,NZD,NGN,NOK,OMR,PKR,PYG,PEN,PHP,PLN,QAR,RON,RUB,SAR,RSD,SCR,SGD,SYP,ZAR,KRW,LKR,SEK,CHF,TWD,THB,TZS,TTD,TRY,UAH,AED,UYU,VEB,VND,ZMK,{% endcapture %}
+                  {% assign supported_codes = settings.currency-switcher-supported-currencies | split: ' ' %}
+                  <option value="{{ shop.currency }}">{{ shop.currency }}</option>
+                  {%- for code in supported_codes -%}
+                    {%- if code != shop.currency and codes contains code -%}
+                      <option value="{{ code }}">{{ code }}</option>
+                    {% endif %}
+                  {%- endfor -%}
+                </select>
+              </span>
+            </div>
+          {% endif %}
+          </div>
+        </div>
+
+        <div class="aligned-right">
+          {% if shop.customer_accounts_enabled %}
+            <div class="customer-links">
+              {% if customer %}
+                <a href="/account">{{ 'layout.header.my_account' | t }}</a>
+
+                <div class="customer-links-inner">
+                  <span class="arrow"></span>
+                  <ul>
+                    <li><a href="/account/orders">{{ 'customers.general.purchases' | t }}</a></li>
+                    <li><a href="/account/addresses">{{ 'customers.addresses.header' | t }}</a></li>
+                    <li>{{ 'layout.header.logout' | t | customer_logout_link }}</li>
+                  </ul>
+                </div>
+              {% else %}
+                {{ 'layout.header.account' | t | customer_login_link }}
+              {% endif %}
+            </div>
+          {% endif %}
+		{% if cart.item_count > -1 %}
+          <div class="mini-cart-wrapper">
+            <a class="cart-count" href="/cart" data-cart-count>
+              <span class="cart-count-text">{{ 'layout.header.cart' | t }}</span>
+              (<span class="cart-count-number">{{ cart.item_count }}</span>)
+            </a>
+
+            {% include 'mini-cart' %}
+          </div>
+          
+          {% endif %}
+          <a class="checkout-link" href="/checkout">{{ 'layout.header.checkout' | t }}</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="header-main-content" data-header-content>
+      {% unless section.settings.menu == blank %}
+        <div class="header-content-left">
+          <button
+            class="navigation-toggle navigation-toggle-open"
+            aria-label="{{ 'layout.header.menu' | t }}"
+            data-header-nav-toggle
+          >
+            <span class="navigation-toggle-icon">
+              {%-
+                include 'icons',
+                id: 'menu'
+              -%}
+            </span>
+          </button>
+        </div>
+      {% endunless %}
+
+      <div class="header-branding header-branding-desktop" data-header-branding>
+        <a class="logo-link" href="/">
+          {%- if section.settings.logo -%}
+            <img
+              class="logo-image"
+              alt="{{ section.settings.logo.alt }}"
+              src="{{ section.settings.logo | img_url: '200x100' }}"
+              srcset="{{ section.settings.logo | img_url: '200x100', scale: 2 }} 2x">
+          {%- else -%}
+            <h1>{{- shop.name -}}</h1>
+          {%- endif -%}
+        </a>
+        <span
+          class="navigation-toggle navigation-toggle-close"
+          data-header-nav-toggle
+        >
+          {%-
+            include 'icons',
+            id: 'close',
+          -%}
+        </span>
+      </div>
+
+      {% unless section.settings.menu == blank %}
+        <div class="navigation-wrapper" data-navigation-wrapper>
+          <nav class="navigation navigation-has-mega-nav" data-navigation-content>
+            <ul class="navigation-menu">
+              {% for link in linklists[section.settings.menu].links %}
+                {% assign hasDropdown = false %}
+                {% assign hasMegaNav = false %}
+
+                {% assign linkHandle = link.title | handle %}
+                {% assign megaNavTrigger = mega_nav_handle | handle %}
+
+                {% if megaNavTrigger != blank and linkHandle == megaNavTrigger %}
+                  {% assign hasMegaNav = true %}
+                {% elsif linklists[linkHandle] and linklists[linkHandle].links.size > 0 %}
+                  {% assign hasDropdown = true %}
+                {% endif %}
+
+                <li
+                  class="{% if hasDropdown %}has-dropdown{% elsif hasMegaNav %}has-mega-nav{% endif %}"
+                  {% if hasMegaNav %}data-mega-nav="true"{% endif %}
+                >
+                  <a
+                    class="navigation-menu-link"
+                    href="{{ link.url }}"
+                    data-linklist-trigger="{{ link.title | downcase | handle }}"
+                  >
+                    {{ link.title }}
+                    {% if hasDropdown or hasMegaNav %}
+                      <span class="navigation-submenu-toggle" data-subnav-toggle>
+                        {{- arrow_right -}}
+                      </span>
+                    {% endif %}
+                  </a>
+
+                  {% if hasDropdown %}
+                    <ul class="navigation-submenu" data-linklist="{{ linkHandle }}">
+                      {% for link in linklists[linkHandle].links %}
+                        <li>
+                          <a
+                            class="navigation-menu-link"
+                            href="{{ link.url }}"
+                          >
+                            {{ link.title }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+
+                  {% elsif hasMegaNav %}
+                    {%- include 'header-mega-nav' %}
+                  {% endif %}
+
+                </li>
+              {% endfor %}
+
+              {% if shop.customer_accounts_enabled %}
+                {% if customer %}
+                  <li class="mobile-link">
+                    <a href="/account">
+                      {{ 'layout.header.my_account' | t }}
+                    </a>
+                  </li>
+                  <li class="mobile-link">
+                    {{ 'layout.header.logout' | t | customer_logout_link }}
+                  </li>
+                {% else %}
+                  <li class="mobile-link">
+                    {{ 'layout.header.account' | t | customer_login_link }}
+                  </li>
+                {% endif %}
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      {% endunless %}
+
+      <div class="header-content-right" data-header-content-right>
+        <form class="header-search-form" action="/search" method="get" data-header-search>
+          <input
+            class="header-search-input"
+            name="q"
+            type="text"
+            placeholder="{{ 'layout.header.search_placeholder' | t }}"
+            value="{{ search.terms }}"
+          >
+          <input
+            class="header-search-button"
+            type="submit"
+            value="&#xe606;"
+            aria-label="{{ 'layout.header.search_submit' | t }}"
+            data-header-search-button
+          >
+
+          <button
+            class="header-search-button-close"
+            aria-hidden="true"
+            data-header-search-button-close
+          >
+            {%-
+              include 'icons',
+              id: 'close',
+            -%}
+          </button>
+        </form>
+
+        {% if section.settings.sticky_header %}
+          <a class="sticky-header-cart-count" href="/cart" data-cart-count>
+            <span class="cart-count-text">{{ 'layout.header.cart' | t }}</span>
+            (<span class="cart-count-number">{{ cart.item_count }}</span>)
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+</section>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image",
+      "info": "200px tall recommended"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "select",
+      "id": "header_layout",
+      "label": "Logo layout",
+      "info": "Logo layouts are only active on screens wider than 1020px",
+      "options": [
+        {
+          "value": "default",
+          "label": "Default"
+        },
+        {
+          "value": "compact-center",
+          "label": "Compact center"
+        },
+        {
+          "value": "compact-left",
+          "label": "Compact left"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "checkbox",
+      "id": "header_full_width",
+      "label": "Enable full width header ",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "header_border",
+      "label": "Show header border",
+      "info": "This will appear on all pages except the home page."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Enable sticky header"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header_logo",
+      "label": "Show logo image in sticky header"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "mega-nav-handle",
+      "label": "Mega navigation trigger ([?](http:\/\/help.pixelunion.net\/customer\/portal\/articles\/1840423-grid-theme-documentation#mega-nav-feature))"
+    },
+    {
+      "type": "image_picker",
+      "id": "mega-nav-image-default",
+      "label": "Featured image",
+      "info": "480 x 1000px recommended"
+    },
+    {
+      "type": "link_list",
+      "id": "mega-nav-1",
+      "label": "Menu 1"
+    },
+    {
+      "type": "link_list",
+      "id": "mega-nav-2",
+      "label": "Menu 2"
+    },
+    {
+      "type": "link_list",
+      "id": "mega-nav-3",
+      "label": "Menu 3"
+    }
+  ]
+}
+
+{% endschema %}
